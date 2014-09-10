@@ -38,7 +38,7 @@ valueRank Jack        = 10
 valueRank (Numeric x) = x
 valueRank Ace         = 11
 
-
+-- If the hand is valued more than 21, gameOver is set to True.
 gameOver :: Hand -> Bool
 gameOver hand | (value hand) <= 21 = False
 gameOver hand | (value hand) > 21 = True
