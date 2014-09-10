@@ -8,10 +8,11 @@ hand2 = Add (Card { rank = Numeric 2, suit = Hearts })
 
 -- size hand2
 --    = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
---      Sends in (Card (Numeric 2) Hearts) as the first Card and (Add (Card Jack Spades) Empty) as    --      the next hand. Adds 1 to the size. The "Empty" will activate the base case and will simply add --      0 to the size of the hand.
+--      Sends in (Card (Numeric 2) Hearts) as the first Card and (Add (Card Jack Spades) Empty) as    
+--      the next hand. Adds 1 to the size. The "Empty" will activate the base case and will simply add 
+--      0 to the size of the hand.
 --    = Adds 1 for every hand and continues until the next hand is "Empty".
 --    = 2
-
 
 aCard1 :: Card
 aCard1 = Card { rank = Ace, suit = Hearts }
@@ -44,8 +45,6 @@ gameOver hand | (value hand) <= 21 = False
 gameOver hand | (value hand) > 21 = True
 
 -- winner :: Hand -> Hand -> Player
-
-
 
 data Player = Guest | Bank
           deriving (Show, Eq)
