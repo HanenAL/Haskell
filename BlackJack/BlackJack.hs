@@ -39,8 +39,9 @@ valueRank (Numeric x) = x
 valueRank Ace         = 11
 
 
--- gameOver :: Hand -> Bool
-
+gameOver :: Hand -> Bool
+gameOver hand | (value hand) <= 21 = False
+gameOver hand | (value hand) > 21 = True
 
 -- winner :: Hand -> Hand -> Player
 
