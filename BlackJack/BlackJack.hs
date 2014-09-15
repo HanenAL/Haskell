@@ -78,3 +78,34 @@ winner :: Hand -> Hand -> Player
 winner guest bank
   | fixAceValue guest > fixAceValue bank && gameOver guest == False = Guest
   | fixAceValue guest <= fixAceValue bank && gameOver bank == False = Bank
+
+-- Combines 2 different hands. (hand1 <+ hand2 = hand3)
+(<+) :: Hand -> Hand -> Hand
+hand1 <+ Empty = hand1
+Empty <+ hand2 = hand2
+Add card hand1 <+ hand2 = Add card (hand1 <+ hand2)
+
+prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
+prop_onTopOf_assoc p1 p2 p3 = p1 <+ (p2 <+ p3) == (p1 <+ p2) <+ p3
+
+prop_size_onTopOf :: Hand -> Hand -> Bool
+prop_size_onTopOf p1 p2 = fixAceValue(p1 <+ p2) == 
+                          fixAceValue p1 + fixAceValue p2
+
+-- Combines all the complete suits into one hand creating a deck of
+-- 52 cards.
+fullDeck :: Hand
+fullDeck = completeSuit ranks Hearts   <+
+           completeSuit ranks Spades   <+
+           completeSuit ranks Diamonds <+
+           completeSuit ranks Clubs
+
+-- List of all the existing ranks.
+ranks :: [Rank]
+ranks =  [Ace, King, Queen, Jack]++[Numeric x | x <- [2..10]]
+
+-- Given a suit and a list of ranks (the list of all the ranks above)
+-- makes a complete set of cards for the that suit.
+completeSuit :: [Rank] -> Suit -> Hand
+completeSuit [] suit = Empty
+completeSuit (x:xs) suit = (Add (Card x suit) Empty) <+ completeSuit xs suit
