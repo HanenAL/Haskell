@@ -105,7 +105,9 @@ ranks :: [Rank]
 ranks =  [Ace, King, Queen, Jack]++[Numeric x | x <- [2..10]]
 
 -- Given a suit and a list of ranks (the list of all the ranks above)
--- makes a complete set of cards for the that suit.
+-- makes a complete set of cards for the said suit.
 completeSuit :: [Rank] -> Suit -> Hand
 completeSuit [] suit = Empty
 completeSuit (x:xs) suit = (Add (Card x suit) Empty) <+ completeSuit xs suit
+
+-- draw :: Hand -> Hand -> (Hand, Hand)
