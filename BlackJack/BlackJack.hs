@@ -32,12 +32,15 @@ aHand2 = Add aCard3 (Add aCard2 (Add aCard1 Empty))
 aHand3 :: Hand
 aHand3 = Add aCard1 Empty
 
+aHand4 :: Hand
+aHand4 = Empty
+
 empty :: Hand
 empty = Empty
 
 -- Use valueRank to determine the value of the current hand.
 totalValue :: Hand -> Integer
-totalValue Empty                       = 0
+totalValue Empty                    = 0
 totalValue (Add (Card rank _) hand) = valueRank rank + totalValue hand
 
 -- fixes the value of the hand if it is more than 21 and it contains ace/s.
@@ -72,19 +75,19 @@ gameOver :: Hand -> Bool
 -- WHO WILL WIN!
 winner :: Hand -> Hand -> Player
 winner guest bank
-  | gameOver guest == True = Bank
-  | gameOver bank  ==  True = Guest
+  | gameOver guest == True    = Bank
+  | gameOver bank  ==  True   = Guest
   | value guest > value bank  = Guest 
   | value guest <= value bank = Bank
 
 
 -- Combines 2 different hands. (hand1 <+ hand2 = hand3)
 (<+) :: Hand -> Hand -> Hand
-hand1 <+ Empty = hand1
-Empty <+ hand2 = hand2
+hand1 <+ Empty          = hand1
+Empty <+ hand2          = hand2
 Add card hand1 <+ hand2 = Add card (hand1 <+ hand2)
 
--- Property, is (<+) associative
+-- Property, is (<+) associative 	3283
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 = p1 <+ (p2 <+ p3) == (p1 <+ p2) <+ p3
 
@@ -107,7 +110,12 @@ ranks =  [Ace, King, Queen, Jack]++[Numeric x | x <- [2..10]]
 -- Given a suit and a list of ranks (the list of all the ranks above)
 -- makes a complete set of cards for the said suit.
 completeSuit :: [Rank] -> Suit -> Hand
-completeSuit [] suit = Empty
+completeSuit [] suit     = Empty
 completeSuit (x:xs) suit = (Add (Card x suit) Empty) <+ completeSuit xs suit
 
--- draw :: Hand -> Hand -> (Hand, Hand)
+-- Takes the first card in the deck and places it in the hand.
+draw :: Hand -> Hand -> (Hand, Hand)
+draw Empty hand            = error "draw: The deck is empty."
+draw (Add card deck) hand  = (deck, (Add card hand))
+
+--playBank :: Hand -> Hand
