@@ -2,20 +2,17 @@ module BlackJack where
 
 import Cards
 import Wrapper
+import Test.QuickCheck
 
 hand2 = Add (Card { rank = Numeric 2, suit = Hearts })
           (Add (Card { rank = Jack, suit = Spades }) Empty)
 
 -- size hand2
 -- = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
---   Sends in (Card (Numeric 2) Hearts) as the 
---   first Card and (Add (Card Jack Spades) Empty) as    
---   the next hand. Adds 1 to the size. The "Empty" 
---   will activate the base case and will simply add 
---   0 to the size of the hand.
--- = Adds 1 for every hand and continues until the next hand is "Empty".
+-- = 1 + size (Add (Card Jack Spades) Empty)
+-- = 2 + size Empty
+-- = 2 + 0
 -- = 2
-
 
 aCard1 :: Card
 aCard1 = Card { rank = Ace, suit = Hearts }
@@ -52,6 +49,7 @@ value hand
 
 -- Values each rank, returns the value in numbers
 valueRank :: Rank -> Integer
+gameOver hand = value hand > 21
 valueRank King        = 10
 valueRank Queen       = 10
 valueRank Jack        = 10
@@ -70,9 +68,8 @@ numberOfAces (Add (Card _ _) hand)   = 0 + numberOfAces hand
 
 -- If the hand is valued more than 21, gameOver is set to True.
 gameOver :: Hand -> Bool
-gameOver hand = value hand > 21
 
--- Check so nothing is wrong here!!!!!!!!!!!!!!!!!!!!!!!!
+-- WHO WILL WIN!
 winner :: Hand -> Hand -> Player
 winner guest bank
   | gameOver guest == True = Bank
@@ -87,12 +84,13 @@ hand1 <+ Empty = hand1
 Empty <+ hand2 = hand2
 Add card hand1 <+ hand2 = Add card (hand1 <+ hand2)
 
+-- Property, is (<+) associative
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 = p1 <+ (p2 <+ p3) == (p1 <+ p2) <+ p3
 
+-- Property, is the size different
 prop_size_onTopOf :: Hand -> Hand -> Bool
-prop_size_onTopOf p1 p2 = value (p1 <+ p2) == 
-                          value p1 + value p2
+prop_size_onTopOf p1 p2 = size (p1 <+ p2) == size p1 + size p2
 
 -- Combines all the complete suits into one hand creating a deck of
 -- 52 cards.
