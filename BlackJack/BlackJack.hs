@@ -81,14 +81,13 @@ winner guest bank
   | value guest > value bank  = Guest 
   | value guest <= value bank = Bank
 
-
 -- Combines 2 different hands. (hand1 <+ hand2 = hand3)
 (<+) :: Hand -> Hand -> Hand
 hand1 <+ Empty          = hand1
 Empty <+ hand2          = hand2
 Add card hand1 <+ hand2 = Add card (hand1 <+ hand2)
 
--- Property, is (<+) associative 	3283
+-- Property, is (<+) associative
 prop_onTopOf_assoc :: Hand -> Hand -> Hand -> Bool
 prop_onTopOf_assoc p1 p2 p3 = p1 <+ (p2 <+ p3) == (p1 <+ p2) <+ p3
 
@@ -99,10 +98,10 @@ prop_size_onTopOf p1 p2 = size (p1 <+ p2) == size p1 + size p2
 -- Combines all the complete suits into one hand creating a deck of
 -- 52 cards.
 fullDeck :: Hand
-fullDeck = completeSuit ranks Hearts   <+
-           completeSuit ranks Spades   <+
-           completeSuit ranks Diamonds <+
-           completeSuit ranks Clubs
+fullDeck = ((completeSuit ranks Hearts   <+
+           completeSuit ranks Spades)    <+
+           (completeSuit ranks Diamonds  <+
+           completeSuit ranks Clubs))
 
 -- List of all the existing ranks.
 ranks :: [Rank]
@@ -126,3 +125,11 @@ playBank' :: Hand -> Hand -> Hand
 playBank' deck bankHand | value bankHand < 16   = playBank' deck' bankHand'
                         | value bankHand >= 16  = bankHand
   where (deck', bankHand') = draw deck bankHand
+
+randomNum :: StdGen -> Int
+randomNum s = fst (randomR(1, 52) s)
+
+shuffle :: StdGen -> Hand -> Hand
+shuffle s Empty           = undefined
+shuffle s (Add card deck) 
+   where pick = randomNum s 
