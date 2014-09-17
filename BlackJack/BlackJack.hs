@@ -3,6 +3,7 @@ module BlackJack where
 import Cards
 import Wrapper
 import Test.QuickCheck
+import System.Random
 
 hand2 = Add (Card { rank = Numeric 2, suit = Hearts })
           (Add (Card { rank = Jack, suit = Spades }) Empty)
@@ -105,7 +106,7 @@ fullDeck = completeSuit ranks Hearts   <+
 
 -- List of all the existing ranks.
 ranks :: [Rank]
-ranks =  [Ace, King, Queen, Jack]++[Numeric x | x <- [2..10]]
+ranks =  [Ace, King, Queen, Jack] ++ [Numeric x | x <- [2..10]]
 
 -- Given a suit and a list of ranks (the list of all the ranks above)
 -- makes a complete set of cards for the said suit.
@@ -118,4 +119,10 @@ draw :: Hand -> Hand -> (Hand, Hand)
 draw Empty hand            = error "draw: The deck is empty."
 draw (Add card deck) hand  = (deck, (Add card hand))
 
---playBank :: Hand -> Hand
+playBank :: Hand -> Hand 
+playBank deck = playBank' deck Empty
+
+playBank' :: Hand -> Hand -> Hand
+playBank' deck bankHand | value bankHand < 16   = playBank' deck' bankHand'
+                        | value bankHand >= 16  = bankHand
+  where (deck', bankHand') = draw deck bankHand
