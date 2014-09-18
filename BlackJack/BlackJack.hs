@@ -118,18 +118,35 @@ draw :: Hand -> Hand -> (Hand, Hand)
 draw Empty hand            = error "draw: The deck is empty."
 draw (Add card deck) hand  = (deck, (Add card hand))
 
+-- Start the bank AI.
 playBank :: Hand -> Hand 
 playBank deck = playBank' deck Empty
 
+-- The bank will continue to draw until its hand is valued 16 or more.
 playBank' :: Hand -> Hand -> Hand
 playBank' deck bankHand | value bankHand < 16   = playBank' deck' bankHand'
                         | value bankHand >= 16  = bankHand
   where (deck', bankHand') = draw deck bankHand
 
-randomNum :: StdGen -> Int
-randomNum s = fst (randomR(1, 52) s)
+-- Given a StdGen and a deck (or hand) it will create a random number between
+-- 0 and the size of the deck/hand.
+randomNum :: StdGen -> Hand -> (Integer, StdGen)
+randomNum gen deck = (randomR(0, (size(deck) - 1)) gen)
 
+-- Start the shuffling! :)
 shuffle :: StdGen -> Hand -> Hand
-shuffle s Empty           = undefined
-shuffle s (Add card deck) 
-   where pick = randomNum s 
+shuffle gen deck = shuffle' gen deck Empty -- Empty == shuffled deck
+
+-- Shuffle' is the help function for shuffle. It'll call randomNum and rndCard
+-- to get random cards and numbers and continue to add them into the new deck.
+shuffle' :: StdGen -> Hand -> Hand -> Hand
+shuffle' gen Empty hand = hand <+ Empty
+shuffle' gen deck hand  = shuffle' gen' hand' (Add card' hand)
+   where (rnd', gen')   = randomNum gen deck
+         (hand', card') = rndCard deck Empty rnd'
+
+-- Picks a random card, given from randomNum
+rndCard :: Hand -> Hand -> Integer -> (Hand, Card)
+rndCard (Add card deck) save rnd | rnd == 0 = ((deck <+ save), card)
+                                 | rnd > 0  = rndCard deck (Add card save) (rnd - 1)
+
