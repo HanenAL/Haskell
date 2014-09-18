@@ -5,36 +5,12 @@ import Wrapper
 import Test.QuickCheck
 import System.Random
 
-hand2 = Add (Card { rank = Numeric 2, suit = Hearts })
-          (Add (Card { rank = Jack, suit = Spades }) Empty)
-
 -- size hand2
 -- = size (Add (Card (Numeric 2) Hearts) (Add (Card Jack Spades) Empty))
 -- = 1 + size (Add (Card Jack Spades) Empty)
 -- = 2 + size Empty
 -- = 2 + 0
 -- = 2
-
-aCard1 :: Card
-aCard1 = Card { rank = Ace, suit = Hearts }
-
-aCard2 :: Card
-aCard2 = Card { rank = King, suit = Diamonds }
-
-aCard3 :: Card
-aCard3 = Card { rank = Queen, suit = Clubs }
-
-aHand1 :: Hand
-aHand1 = Add aCard2 (Add aCard1 (Add aCard2 (Add aCard3 Empty)))
-
-aHand2 :: Hand
-aHand2 = Add aCard3 (Add aCard2 (Add aCard1 Empty))
-
-aHand3 :: Hand
-aHand3 = Add aCard1 Empty
-
-aHand4 :: Hand
-aHand4 = Empty
 
 empty :: Hand
 empty = Empty
@@ -150,3 +126,28 @@ rndCard :: Hand -> Hand -> Integer -> (Hand, Card)
 rndCard (Add card deck) save rnd | rnd == 0 = ((deck <+ save), card)
                                  | rnd > 0  = rndCard deck (Add card save) (rnd - 1)
 
+prop_shuffle_sameCards :: StdGen -> Card -> Hand -> Bool
+prop_shuffle_sameCards g c h =
+  c `belongsTo` h == c `belongsTo` shuffle g h
+
+belongsTo :: Card -> Hand -> Bool
+c `belongsTo` Empty    = False
+c `belongsTo` Add c' h = c == c' || c `belongsTo` h
+
+prop_size_shuffle :: StdGen -> Hand -> Bool
+prop_size_shuffle g Empty = False
+prop_size_shuffle g h     = size(h) == size(shuffle g h)
+
+implementation = Interface
+  {  iEmpty     = empty
+  ,  iFullDeck  = fullDeck
+  ,  iValue     = value
+  ,  iGameOver  = gameOver
+  ,  iWinner    = winner
+  ,  iDraw      = draw
+  ,  iPlayBank  = playBank
+  ,  iShuffle   = shuffle
+  }
+
+main :: IO ()
+main = runGame implementation
