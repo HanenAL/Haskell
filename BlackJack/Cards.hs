@@ -59,3 +59,11 @@ instance Arbitrary Hand where
 size :: Num a => Hand -> a
 size Empty            = 0
 size (Add card hand)  = 1 + size hand
+
+-- We also need to be able to generate random number generators. (This
+-- does not really belong in this file, but is placed here to reduce
+-- the number of files needed.)
+
+instance Arbitrary StdGen where
+  arbitrary = do n <- arbitrary
+                 return (mkStdGen n)
