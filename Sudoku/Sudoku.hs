@@ -1,3 +1,9 @@
+module Sudoku where
+
+import Test.QuickCheck
+
+-----------------------------------------------------------------------------
+
 data Sudoku = Sudoku [[Maybe Int]]
 
 rows :: Sudoku -> [[Maybe Int]]
@@ -10,4 +16,10 @@ allBlankSudoku = Sudoku ([ [ Nothing | x <- [1..9] ] | x <- [1..9] ])
 
 -- A2:
 isSudoku :: Sudoku -> Bool
-isSudoku sudoku = 
+isSudoku sudoku = undefined
+
+-- A3:
+isSolved :: Sudoku -> Bool
+isSolved = undefined
+
+-----------------------------------------------------------------------------
