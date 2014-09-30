@@ -49,9 +49,11 @@ allBlankSudoku :: Sudoku
 allBlankSudoku = Sudoku ([ [ Nothing | x <- [1..9] ] | x <- [1..9] ])
 
 -- A2:
+-- Checks if the sudoku is in okay format
 isSudoku :: Sudoku -> Bool
 isSudoku sudoku = sizeOK (rows sudoku)
 
+-- Checks size of all the rows and the list of rows
 sizeOK :: [[Maybe Int]] -> Bool
 sizeOK xs | size xs /= 9 = False
 sizeOK xs | otherwise    = and [ (size (selectRow xs x )) == 9 | x <- [0..8] ]
@@ -117,6 +119,11 @@ makeSudoku xs = Sudoku [ convert s | s <- ys]
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
 cell = undefined
+--cell = frequency
+--     [ (1, Nothing)
+--     , (9, do a <- choose (1,9)
+--              return (a)) -- Needs to be a INT. How?
+--     ]
 
 -- an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
