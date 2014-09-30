@@ -95,19 +95,22 @@ printRow (Just a:xs)  = [intToDigit a] ++ printRow xs
 
 -- B2:
 readSudoku :: FilePath -> IO Sudoku
-readSudoku file = 
-   do sudoku <- readFile file
-      if   undefined
-      then undefined
-      else error "Not a sudoku!"
+readSudoku file =
+   do s <- readFile file
+      return(makeSudoku s)
 
 listRows :: String -> [String]
 listRows s = lines s
 
 convert :: String -> [Maybe Int]
-convert []       = []
-convert (x:xs) | ord x == "." = Nothing ++ convert xs
-convert (x:xs) | isDigit x == True = Just x ++ convert xs
+convert []                         = []
+convert ('.':xs)                   = [Nothing] ++ convert xs
+convert (x:xs) | isDigit x == True = [Just (digitToInt x)] ++ convert xs
+               | otherwise         = error "Not a sudoku!"
+
+makeSudoku :: String -> Sudoku
+makeSudoku xs = Sudoku [ convert s | s <- ys]
+   where ys = listRows xs
 
 -----------------------------------------------------------------------------
 
