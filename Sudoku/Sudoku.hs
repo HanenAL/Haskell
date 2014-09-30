@@ -1,4 +1,7 @@
 module Sudoku where
+import Data.Char
+import Data.List
+import Test.QuickCheck
 
 --import Test.QuickCheck
 
@@ -38,6 +41,7 @@ example2 =
       , [Nothing,Nothing,Just 7, Just 6, Just 9, Nothing,Nothing,Just 4, Just 3]
       ]
 
+-----------------------------------------------------------------------------
 
 -- A1:
 -- Creates a list of lists containing 9 "nothing" each, (map).
@@ -69,5 +73,52 @@ isSolved sudoku = and [ checkRow (selectRow (rows sudoku) x) | x <- [0..8] ]
 
 -- Add function: check every row if they have any "nothing".
 -- Add function: Adds the boolean value of all rows.
+
+-----------------------------------------------------------------------------
+
+-- printRow (selectRow(rows example2) 0)
+-- B1:
+printSudoku :: Sudoku -> IO ()
+printSudoku sudoku = putStr $ printLines(sudokuToString sudoku)
+
+printLines :: [String] -> String
+printLines []   = ""
+printLines (x:xs) = x ++ "\n" ++ printLines xs
+
+sudokuToString :: Sudoku -> [String]
+sudokuToString sudoku = [ printRow (selectRow(rows sudoku) x) | x <- [0..8] ]
+
+printRow :: [Maybe Int] -> String
+printRow []           = ""
+printRow (Nothing:xs) = "." ++ printRow xs
+printRow (Just a:xs)  = [intToDigit a] ++ printRow xs
+
+-- B2:
+readSudoku :: FilePath -> IO Sudoku
+readSudoku file = 
+   do sudoku <- readFile file
+      if   undefined
+      then undefined
+      else error "Not a sudoku!"
+
+listRows :: String -> [String]
+listRows s = lines s
+
+convert :: String -> [Maybe Int]
+convert []       = []
+convert (x:xs) | ord x == "." = Nothing ++ convert xs
+convert (x:xs) | isDigit x == True = Just x ++ convert xs
+
+-----------------------------------------------------------------------------
+
+-- cell generates an arbitrary cell in a Sudoku
+cell :: Gen (Maybe Int)
+cell = undefined
+
+-- an instance for generating Arbitrary Sudokus
+instance Arbitrary Sudoku where
+  arbitrary =
+    do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
+       return (Sudoku rows)
 
 -----------------------------------------------------------------------------
