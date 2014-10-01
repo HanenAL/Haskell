@@ -73,23 +73,22 @@ size (x:xs) = 1 + size xs
 isSolved :: Sudoku -> Bool
 isSolved sudoku = and [ checkRow (selectRow (rows sudoku) x) | x <- [0..8] ]
 
--- Add function: check every row if they have any "nothing".
--- Add function: Adds the boolean value of all rows.
-
 -----------------------------------------------------------------------------
 
--- printRow (selectRow(rows example2) 0)
 -- B1:
 printSudoku :: Sudoku -> IO ()
 printSudoku sudoku = putStr $ printLines(sudokuToString sudoku)
 
+-- Combine all the strings into one string on new lines.
 printLines :: [String] -> String
 printLines []   = ""
 printLines (x:xs) = x ++ "\n" ++ printLines xs
 
+-- Convert a complete sudoku to a list of strings.
 sudokuToString :: Sudoku -> [String]
 sudokuToString sudoku = [ printRow (selectRow(rows sudoku) x) | x <- [0..8] ]
 
+-- Converts a single row into a string.
 printRow :: [Maybe Int] -> String
 printRow []           = ""
 printRow (Nothing:xs) = "." ++ printRow xs
@@ -98,37 +97,54 @@ printRow (Just a:xs)  = [intToDigit a] ++ printRow xs
 -- B2:
 readSudoku :: FilePath -> IO Sudoku
 readSudoku file =
-   do s <- readFile file
-      return(makeSudoku s)
+   do string <- readFile file
+      return(makeSudoku string)
 
+-- Removes new lines and creates a list of all the rows as strings.
 listRows :: String -> [String]
 listRows s = lines s
 
+-- converts a string into a row.
 convert :: String -> [Maybe Int]
-convert []                         = []
-convert ('.':xs)                   = [Nothing] ++ convert xs
-convert (x:xs) | isDigit x == True = [Just (digitToInt x)] ++ convert xs
-               | otherwise         = error "Not a sudoku!"
+convert []                 = []
+convert ('.':xs)           = [Nothing] ++ convert xs
+convert (x:xs) | isDigit x = [Just (digitToInt x)] ++ convert xs
+               | otherwise = error "Not a sudoku!"
 
+-- With the use of convert, creates a sudoku out of the strings.
 makeSudoku :: String -> Sudoku
 makeSudoku xs = Sudoku [ convert s | s <- ys]
    where ys = listRows xs
 
 -----------------------------------------------------------------------------
 
+-- C1:
 -- cell generates an arbitrary cell in a Sudoku
 cell :: Gen (Maybe Int)
-cell = undefined
---cell = frequency
---     [ (1, Nothing)
---     , (9, do a <- choose (1,9)
---              return (a)) -- Needs to be a INT. How?
---     ]
+cell = frequency
+     [ (9, return Nothing)
+     , (1, do a <- choose (1,9)
+              return (Just a))
+     ]
 
+-- C2:
 -- an instance for generating Arbitrary Sudokus
 instance Arbitrary Sudoku where
   arbitrary =
     do rows <- sequence [ sequence [ cell | j <- [1..9] ] | i <- [1..9] ]
        return (Sudoku rows)
+
+-- C3:
+-- Is the random generated object a sudoku?
+prop_Sudoku :: Sudoku -> Bool
+prop_Sudoku sudoku = isSudoku sudoku
+
+-----------------------------------------------------------------------------
+
+type Block = [Maybe Int]
+
+-- D1:
+isOkayBlock :: Block -> Bool
+isOkayBlock (x:y:xs) = undefined -- add something here! :3
 
 -----------------------------------------------------------------------------
