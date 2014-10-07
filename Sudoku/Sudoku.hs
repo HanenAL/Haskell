@@ -145,6 +145,23 @@ type Block = [Maybe Int]
 
 -- D1:
 isOkayBlock :: Block -> Bool
-isOkayBlock (x:y:xs) = undefined -- add something here! :3
+isOkayBlock block = nub block == block
+
+-- Removes *Nothing*
+removeNothing :: Block -> Block
+removeNothing []           = []
+removeNothing (Nothing:xs) = removeNothing xs
+removeNothing (x:xs)       = [x] ++ removeNothing xs
+
+-- D2
+blocks :: Sudoku -> [Block]
+blocks (Sudoku []) = []
+blocks sud@(Sudoku (x:y:z:xs)) = [createBlock sud 3] ++ blocks (Sudoku ((drop 3 x):(drop 3 y):(drop 3 z):xs))
+
+
+
+createBlock :: Sudoku -> Int -> Block
+createBlock (Sudoku (x:xs)) 0 = []
+createBlock (Sudoku (x:xs)) n = take 3 x ++ createBlock (Sudoku xs) (n - 1)
 
 -----------------------------------------------------------------------------
