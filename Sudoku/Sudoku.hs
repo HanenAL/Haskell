@@ -156,12 +156,19 @@ removeNothing (x:xs)       = [x] ++ removeNothing xs
 -- D2
 blocks :: Sudoku -> [Block]
 blocks (Sudoku []) = []
-blocks sud@(Sudoku (x:y:z:xs)) = [createBlock sud 3] ++ blocks (Sudoku ((drop 3 x):(drop 3 y):(drop 3 z):xs))
+blocks sud@(Sudoku (x:y:z:xs)) 
+               | z == []   = blocks (Sudoku xs)
+               | otherwise = [createBlock sud 3] ++ 
+                 blocks (Sudoku ((drop 3 x):(drop 3 y):(drop 3 z):xs))
 
-
-
+-- Creates a single block
 createBlock :: Sudoku -> Int -> Block
 createBlock (Sudoku (x:xs)) 0 = []
+createBlock (Sudoku (x:[])) n = take 3 x
 createBlock (Sudoku (x:xs)) n = take 3 x ++ createBlock (Sudoku xs) (n - 1)
+
+-- D3
+isOkay :: Sudoku -> Bool
+isOkay sud = undefined
 
 -----------------------------------------------------------------------------
