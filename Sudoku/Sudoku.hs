@@ -171,12 +171,15 @@ createBlock (Sudoku (x:[])) n = take 3 x
 createBlock (Sudoku (x:xs)) n = take 3 x ++ createBlock (Sudoku xs) (n - 1)
 
 -- D3
-isOkay :: Sudoku -> Bool
+isOkay :: Sudoku -> Bool	
 isOkay sud = and [ isOkayBlock x | x <- (blocks sud) ]
 
 -----------------------------------------------------------------------------
 
--- E1
+type Pos = (Int, Int)
 
+-- E1
+blank :: Sudoku -> Pos
+blank (Sudoku (x:xs)) = undefined
 
 -----------------------------------------------------------------------------
