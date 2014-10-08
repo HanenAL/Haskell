@@ -18,7 +18,7 @@ example =
     Sudoku
       [ [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
-      , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
+      , [Just 3, Just 6, Nothing,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
@@ -58,7 +58,7 @@ sizeOK :: [[Maybe Int]] -> Bool
 sizeOK xs | size xs /= 9 = False
 sizeOK xs | otherwise    = and [ (size (selectRow xs x )) == 9 | x <- [0..8] ]
 
-selectRow :: [[Maybe Int]] -> Int -> [Maybe Int]
+selectRow :: [[a]] -> Int -> [a]
 selectRow (x:_) 0  = x
 selectRow (x:xs) n = selectRow xs (n-1)
 
@@ -180,6 +180,41 @@ type Pos = (Int, Int)
 
 -- E1
 blank :: Sudoku -> Pos
-blank (Sudoku (x:xs)) = undefined
+blank (Sudoku rs) | n > 8     = (9, 9)
+                  | otherwise = (findBlankInRow(selectRow rs n), n)
+   where n = findBlankInColumn rs
+
+findBlankInRow :: Block -> Int
+findBlankInRow []                     = 0
+findBlankInRow (x:xs)
+                       | x /= Nothing = 1 + findBlankInRow xs
+                       | otherwise    = 0
+                       
+findBlankInColumn :: [Block] -> Int
+findBlankInColumn []     = 0
+findBlankInColumn (x:xs) | findBlankInRow x > 8 = 1 + findBlankInColumn xs
+                         | otherwise            = 0
+
+prop_isBlank :: Sudoku -> Bool
+prop_isBlank sud = (selectEle (selectRow (rows sud) y) x) == Nothing
+   where (x, y) = blank sud
+
+selectEle :: [a] -> Int -> a
+selectEle (x:_) 0  = x
+selectEle (x:xs) n = selectEle xs (n-1)
+
+-- E2
+(!!=) :: [a] -> (Int, a) -> [a]
+(x:xs) !!= (index, obj) | index /= 0 = x : (xs) !!= (index - 1, obj)
+                        | otherwise  = [obj] ++ xs
+
+--add props for !!=
+
+-- E3
+update :: Sudoku -> Pos -> Maybe Int -> Sudoku
+update (Sudoku rs) (x, y) obj = Sudoku (rs !!= (y, (updateRow rs (x, y) obj)))
+
+updateRow :: [Block] -> Pos -> Maybe Int -> Block
+updateRow rs (x, y) obj = (selectRow rs y) !!= (x, obj)
 
 -----------------------------------------------------------------------------
