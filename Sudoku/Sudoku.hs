@@ -212,9 +212,10 @@ selectEle (x:xs) n = selectEle xs (n-1)
 
 -- E3
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
-update (Sudoku rs) (x, y) obj = Sudoku (rs !!= (y, (updateRow rs (x, y) obj)))
+update (Sudoku rs) (y, x) obj = Sudoku (rs !!= (y, (updateRow rs (y, x) obj)))
 
 updateRow :: [Block] -> Pos -> Maybe Int -> Block
-updateRow rs (x, y) obj = (selectRow rs y) !!= (x, obj)
+updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 
 -----------------------------------------------------------------------------
+
