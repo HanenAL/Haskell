@@ -208,7 +208,8 @@ selectEle (x:xs) n = selectEle xs (n-1)
 (x:xs) !!= (index, obj) | index /= 0 = x : (xs) !!= (index - 1, obj)
                         | otherwise  = [obj] ++ xs
 
---add props for !!=
+prop_changeElem :: [a] -> (Int,a) -> Bool
+prop_changeElem list (index, obj) = (selectRow (rows sud) y ) !!= (index, obj)) !! index == obj
 
 -- E3
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
@@ -217,6 +218,9 @@ update (Sudoku rs) (y, x) obj = Sudoku (rs !!= (y, (updateRow rs (y, x) obj)))
 updateRow :: [Block] -> Pos -> Maybe Int -> Block
 updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 
+-- add prop for update
+prop_updatePosition :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_updatePosition sud (y,x) obj  = ((selectRow (rows sud) y) !! x) == obj
 -----------------------------------------------------------------------------
 
 -- F1:
@@ -249,7 +253,8 @@ readAndSolve path = do
          
 -- F3:
 isSolutionOf :: Sudoku -> Sudoku -> Bool
-isSolutionOf sud1 sud2 = isOkay sud1 && sud1 == fromJust (solve sud2)
+sud1 `isSolutionOf` sud2 = isOkay sud1 && sud1 == fromJust (solve sud2)
                          
-
 --F4
+prop_SolveSound :: Sudoku -> Property
+prop_SolveSound sud = undefined
