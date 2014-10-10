@@ -220,23 +220,34 @@ updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 -----------------------------------------------------------------------------
 
 -- F1:
-solve :: Sudoku -> Maybe Sudoku
+{-solve :: Sudoku -> Maybe Sudoku
 solve sud | isOkay sud == False = Nothing
-          | blank sud == (9,9)  = Just sud
+          | blank sud  == (9,9) = Just sud
           | otherwise           = if isSolved sud
                                   then Just sud
-                                  else solve (solve' sud (blank sud) 9)
+                                  else solve (addSudoku sud (blank sud) 9)-}
 
-solve' :: Sudoku -> Pos -> Int -> Sudoku 
-solve' sud pos@(y, x) 0 = sud
-solve' sud pos@(y, x) n = if isOkay (update sud pos (Just n))
-                          then update sud pos (Just n)
-                          else solve' sud pos (n - 1)
+addSudoku :: Sudoku -> Pos -> Int -> [Sudoku] 
+addSudoku sud pos@(y, x) 0 = []
+addSudoku sud pos@(y, x) n | isOkay (update sud pos (Just n)) =
+                       update sud pos (Just n) : addSudoku sud pos (n - 1)
+                           | otherwise = addSudoku sud pos (n - 1)
+                           
+addSudoku2 :: Sudoku -> Pos -> Int -> Sudoku 
+addSudoku2 sud pos@(y, x) n | isOkay (update sud pos (Just n)) =
+                                                    update sud pos (Just n)
+                            | otherwise = undefined
+                          
+checkSudokus :: [Sudoku] -> [Sudoku]
+checkSudokus sud | or[ isSolved x | x <- sud ] = sud
+checkSudokus sud = checkSudokus (fixList [addSudoku a (blank a) 9 | a <- sud])
 
-toSudoku :: Maybe Sudoku -> Sudoku
-toSudoku (Just sud) = sud
+fixList :: [[Sudoku]] -> [Sudoku]
+fixList []     = []
+fixList (x:xs) = x ++ fixList xs
 
 {-main :: IO()
 main = do 
          sud <- readSudoku "easy1.sud"
          printSudoku $ fromJust $ solve (sud)-}
+         
