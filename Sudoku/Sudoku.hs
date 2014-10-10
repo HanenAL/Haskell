@@ -1,9 +1,9 @@
-module Sudoku where
+module Main where
+
 import Data.Char
 import Data.List
+import Data.Maybe
 import Test.QuickCheck
-
---import Test.QuickCheck
 
 -----------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ example :: Sudoku
 example =
     Sudoku
       [ [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
-      , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
+      , [Just 3, Just 6, Just 5,Just 5,Nothing, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Nothing,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
       , [Just 3, Just 6, Just 5,Just 5,Just 7, Just 1, Just 2, Just 5,Just 5]
@@ -181,7 +181,7 @@ type Pos = (Int, Int)
 -- E1
 blank :: Sudoku -> Pos
 blank (Sudoku rs) | n > 8     = (9, 9)
-                  | otherwise = (findBlankInRow(selectRow rs n), n)
+                  | otherwise = (n, findBlankInRow(selectRow rs n))
    where n = findBlankInColumn rs
 
 findBlankInRow :: Block -> Int
@@ -219,3 +219,24 @@ updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 
 -----------------------------------------------------------------------------
 
+-- F1:
+solve :: Sudoku -> Maybe Sudoku
+solve sud | isOkay sud == False = Nothing
+          | blank sud == (9,9)  = Just sud
+          | otherwise           = if isSolved sud
+                                  then Just sud
+                                  else solve (solve' sud (blank sud) 9)
+
+solve' :: Sudoku -> Pos -> Int -> Sudoku 
+solve' sud pos@(y, x) 0 = sud
+solve' sud pos@(y, x) n = if isOkay (update sud pos (Just n))
+                          then update sud pos (Just n)
+                          else solve' sud pos (n - 1)
+
+toSudoku :: Maybe Sudoku -> Sudoku
+toSudoku (Just sud) = sud
+
+{-main :: IO()
+main = do 
+         sud <- readSudoku "easy1.sud"
+         printSudoku $ fromJust $ solve (sud)-}
