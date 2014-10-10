@@ -220,34 +220,36 @@ updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 -----------------------------------------------------------------------------
 
 -- F1:
-{-solve :: Sudoku -> Maybe Sudoku
-solve sud | isOkay sud == False = Nothing
-          | blank sud  == (9,9) = Just sud
-          | otherwise           = if isSolved sud
-                                  then Just sud
-                                  else solve (addSudoku sud (blank sud) 9)-}
+solve :: Sudoku -> Maybe Sudoku
+solve sud | isOkay sud = Just $ head $ checkSudokus (addSudoku sud (blank sud) 9)
+          | otherwise  = Nothing
 
 addSudoku :: Sudoku -> Pos -> Int -> [Sudoku] 
 addSudoku sud pos@(y, x) 0 = []
 addSudoku sud pos@(y, x) n | isOkay (update sud pos (Just n)) =
                        update sud pos (Just n) : addSudoku sud pos (n - 1)
                            | otherwise = addSudoku sud pos (n - 1)
-                           
-addSudoku2 :: Sudoku -> Pos -> Int -> Sudoku 
-addSudoku2 sud pos@(y, x) n | isOkay (update sud pos (Just n)) =
-                                                    update sud pos (Just n)
-                            | otherwise = undefined
                           
 checkSudokus :: [Sudoku] -> [Sudoku]
 checkSudokus sud | or[ isSolved x | x <- sud ] = sud
-checkSudokus sud = checkSudokus (fixList [addSudoku a (blank a) 9 | a <- sud])
-
-fixList :: [[Sudoku]] -> [Sudoku]
-fixList []     = []
-fixList (x:xs) = x ++ fixList xs
+checkSudokus sud = checkSudokus (concat [addSudoku a (blank a) 9 | a <- sud])
 
 {-main :: IO()
 main = do 
-         sud <- readSudoku "easy1.sud"
-         printSudoku $ fromJust $ solve (sud)-}
+         sud <- readSudoku "hard55.sud"
+         printSudoku $ head $ checkSudokus (addSudoku sud (blank sud) 9)-}
+
+-- F2:
+readAndSolve :: FilePath -> IO()
+readAndSolve path = do 
+  sud <- readSudoku path
+  if solve sud == Nothing
+  then putStr "No solution\n"
+  else printSudoku $ fromJust $ solve sud 
          
+-- F3:
+isSolutionOf :: Sudoku -> Sudoku -> Bool
+isSolutionOf sud1 sud2 = isOkay sud1 && sud1 == fromJust (solve sud2)
+                         
+
+--F4
