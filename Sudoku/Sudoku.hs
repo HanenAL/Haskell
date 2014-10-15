@@ -170,6 +170,15 @@ createBlock (Sudoku (x:xs)) 0 = []
 createBlock (Sudoku (x:[])) n = take 3 x
 createBlock (Sudoku (x:xs)) n = take 3 x ++ createBlock (Sudoku xs) (n - 1)
 
+
+prop_blocks :: Sudoku -> Bool
+prop_blocks sud = length (blocks sud) == 27 && prop_blocks' (blocks sud) == 243
+
+prop_blocks' :: [Block] -> Int
+prop_blocks' [] = 0
+prop_blocks' (x:xs) = (length x) + prop_blocks' xs
+
+
 -- D3
 isOkay :: Sudoku -> Bool	
 isOkay sud = and [ isOkayBlock x | x <- (blocks sud) ]
@@ -196,7 +205,7 @@ findBlankInColumn (x:xs) | findBlankInRow x > 8 = 1 + findBlankInColumn xs
                          | otherwise            = 0
 
 prop_isBlank :: Sudoku -> Bool
-prop_isBlank sud = (selectEle (selectRow (rows sud) y) x) == Nothing
+prop_isBlank sud = (selectEle (selectRow (rows sud) x) y) == Nothing
    where (x, y) = blank sud
 
 selectEle :: [a] -> Int -> a
@@ -208,8 +217,11 @@ selectEle (x:xs) n = selectEle xs (n-1)
 (x:xs) !!= (index, obj) | index /= 0 = x : (xs) !!= (index - 1, obj)
                         | otherwise  = [obj] ++ xs
 
-prop_changeElem :: [a] -> (Int,a) -> Bool
-prop_changeElem list (index, obj) = (selectRow (rows sud) y ) !!= (index, obj)) !! index == obj
+prop_changeElem :: [Int] -> (Int,Int) -> Bool
+prop_changeElem list (index, obj) = list !!= (index, obj) 
+
+prop_changeElem :: [Int] -> Int -> Int
+prop_changeElem x:xs n = --------------------------------------------------------------------
 
 -- E3
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
@@ -221,7 +233,12 @@ updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 -- add prop for update
 prop_updatePosition :: Sudoku -> Pos -> Maybe Int -> Bool
 prop_updatePosition sud (y,x) obj  = ((selectRow (rows sud) y) !! x) == obj
------------------------------------------------------------------------------
+
+prop_updateChanged :: Sudoku -> Pos -> Maybe Int -> Bool
+prop_updateChanged sud pos@(y,x) obj | obj /= Nothing = (update sud pos obj) /= sud
+                                     | otherwise      = True
+
+-------------------------------------------------------------------------------------------
 
 -- F1:
 solve :: Sudoku -> Maybe Sudoku
@@ -238,10 +255,10 @@ checkSudokus :: [Sudoku] -> [Sudoku]
 checkSudokus sud | or[ isSolved x | x <- sud ] = sud
 checkSudokus sud = checkSudokus (concat [addSudoku a (blank a) 9 | a <- sud])
 
-{-main :: IO()
+main :: IO()
 main = do 
          sud <- readSudoku "hard55.sud"
-         printSudoku $ head $ checkSudokus (addSudoku sud (blank sud) 9)-}
+         printSudoku $ head $ checkSudokus (addSudoku sud (blank sud) 9)
 
 -- F2:
 readAndSolve :: FilePath -> IO()
@@ -256,5 +273,10 @@ isSolutionOf :: Sudoku -> Sudoku -> Bool
 sud1 `isSolutionOf` sud2 = isOkay sud1 && sud1 == fromJust (solve sud2)
                          
 --F4
+fewerCheck prop = quickCheckWith stdArgs{ maxSuccess = 5 } prop
+
 prop_SolveSound :: Sudoku -> Property
-prop_SolveSound sud = undefined
+prop_SolveSound sud = 
+  isOkay sud ==> (fromJust $ solve sud) `isSolutionOf` sud
+
+---------------------------------------------------------------------------------------------
