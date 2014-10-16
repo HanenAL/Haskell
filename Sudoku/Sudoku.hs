@@ -214,14 +214,14 @@ selectEle (x:xs) n = selectEle xs (n-1)
 
 -- E2
 (!!=) :: [a] -> (Int, a) -> [a]
+[]     !!= (index, obj)              = [obj]
 (x:xs) !!= (index, obj) | index /= 0 = x : (xs) !!= (index - 1, obj)
-                        | otherwise  = [obj] ++ xs
+                        | otherwise  = obj : xs
 
-prop_changeElem :: [Int] -> (Int,Int) -> Bool
-prop_changeElem list (index, obj) = list !!= (index, obj) 
-
-prop_changeElem :: [Int] -> Int -> Int
-prop_changeElem x:xs n = --------------------------------------------------------------------
+prop_changeElem :: [Int] -> (Int,Int) -> Property
+prop_changeElem list (index, obj) = list /= [] ==> (list !!= (index', obj)) !! index' == obj
+  where
+    index' = index `mod` length list
 
 -- E3
 update :: Sudoku -> Pos -> Maybe Int -> Sudoku
@@ -230,13 +230,14 @@ update (Sudoku rs) (y, x) obj = Sudoku (rs !!= (y, (updateRow rs (y, x) obj)))
 updateRow :: [Block] -> Pos -> Maybe Int -> Block
 updateRow rs (y, x) obj = (selectRow rs y) !!= (x, obj)
 
--- add prop for update
 prop_updatePosition :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_updatePosition sud (y,x) obj  = ((selectRow (rows sud) y) !! x) == obj
+prop_updatePosition sud (y, x) obj = (selectRow (rows (update sud (y', x') obj)) y') !! x' == obj
+  where
+    y' = y `mod` 9
+    x' = x `mod` 9
 
-prop_updateChanged :: Sudoku -> Pos -> Maybe Int -> Bool
-prop_updateChanged sud pos@(y,x) obj | obj /= Nothing = (update sud pos obj) /= sud
-                                     | otherwise      = True
+prop_updateChanged :: Sudoku -> Pos -> Maybe Int -> Property
+prop_updateChanged sud pos@(y,x) obj = obj /= Nothing ==> (update sud pos obj) /= sud
 
 -------------------------------------------------------------------------------------------
 
