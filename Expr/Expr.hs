@@ -92,9 +92,11 @@ factor s = num s
 
 readExpr :: String -> Maybe Expr
 readExpr s =
-  case expr s of
+  case expr s' of
     Just (a,"") -> Just a
     _           -> Nothing
+  where
+    s' = filter (/= ' ') s
 
 -----------------------------------------------------------------------------
 
