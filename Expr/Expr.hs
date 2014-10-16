@@ -76,11 +76,11 @@ factor ('(':s) =
    case expr s of
       Just (a, ')':s1) -> Just (a, s1)
       _                -> Nothing
-factor ('s':'i':'n':s) =
+factor ('S':'i':'n':s) =
    case factor s of
       Just (a, s1) -> Just (Sin a, s1)
       _            -> Nothing
-factor ('c':'o':'s':s) =
+factor ('C':'o':'s':s) =
    case factor s of
       Just (a, s1) -> Just (Cos a, s1)
       _            -> Nothing
@@ -120,8 +120,6 @@ arbExpr s =
                      return (Sin n))
             , (s, do n <- arbExpr s'
                      return (Cos n))
-            , (s, do n <- arbExpr s'
-                     return (Sin n))
             ]
  where
   s' = s `div` 2
