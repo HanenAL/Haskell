@@ -45,18 +45,12 @@ eval (Cos n) x   = cos (eval n x)
 type Parser a = String -> Maybe (a,String)
 
 -- `number` parses a number
-number :: Parser Double
-number (c:s) | isDigit c = Just ()
--- number ('-':s)           = fmap negate' (number s)
-number _                 = Nothing
+number :: Parser Double -- )
+number s = listToMaybe(reads s)
+--number ('-':s)           = fmap negate' (number s)
 
 negate' :: (Double,String) -> (Double,String)
 negate' (n,s) = (-n,s)
-
--- Helper function to convert a string to an integer
-digits :: Double -> String -> (Double,String)
-digits n (c:s) | isDigit c = digits (10*n + digitToInt c) s
-digits n s                 = (n,s)
 
 -- `num` parses a numeric expression
 num :: Parser Expr
@@ -66,7 +60,6 @@ num s = case number s of
 
 -- * an expression is a '+'-chain of terms
 -- * a term is a '*'-chain of factors
-
 expr, term :: Parser Expr
 expr = chain term   '+' Add
 term = chain factor '*' Mul
@@ -92,7 +85,7 @@ chain p op f s1 =
 -- `factor` parses a "factor": either a number or an expression surrounded by
 -- parentheses
 factor :: Parser Expr
-factor ('(':s) =
+factor ('(  ':s) =
    case expr s of
       Just (a, ')':s1) -> Just (a, s1)
       _                -> Nothing
