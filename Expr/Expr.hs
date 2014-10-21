@@ -3,8 +3,6 @@ module Expr where
 import Data.Char
 import Data.Maybe
 
-import Pages
-
 -----------------------------------------------------------------------------
 
 data Expr = Num Double
@@ -85,10 +83,10 @@ factor ('C':'o':'s':s) =
    case factor s of
       Just (a, s1) -> Just (Cos a, s1)
       _            -> Nothing
-factor ('x':s) =
-   case factor s of
-      Just (a, s1) -> Just (X, s1)
-      _            -> Nothing
+factor ('x':s) = Just (X, s)
+--   case factor s of
+--      Just (a, s1) -> Just (X, s1)
+--      _            -> Nothing
 factor s = num s
 
 readExpr :: String -> Maybe Expr
