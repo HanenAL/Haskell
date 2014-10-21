@@ -31,6 +31,7 @@ arbExpr s =
                      return (Sin n))
             , (s, do n <- arbExpr s'
                      return (Cos n))
+            , (s, return X)
             ]
  where
   s' = s `div` 2
