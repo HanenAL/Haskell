@@ -13,6 +13,9 @@ data Expr = Num Double
           | Cos Expr
     deriving(Eq)
 
+example :: Expr
+example = (Sin (Add (Num 3) (Mul (Num 2) (X))))
+
 -----------------------------------------------------------------------------
 
 showExpr :: Expr -> String
@@ -20,12 +23,17 @@ showExpr (Num n)   = show n
 showExpr (Add a b) = showExpr a ++ "+" ++ showExpr b
 showExpr (Mul a b) = showFactor a ++ "*" ++ showFactor b
 showExpr X         = "x"
-showExpr (Sin n)   = "Sin " ++ "(" ++ showExpr n ++ ")"
-showExpr (Cos n)   = "Cos " ++ "(" ++ showExpr n ++ ")"
+showExpr (Sin n)   = "sin " ++ showSC n
+showExpr (Cos n)   = "cos " ++ showSC n
 
 showFactor :: Expr -> String
 showFactor (Add a b) = "(" ++ showExpr (Add a b) ++")"
 showFactor e         = showExpr e
+
+showSC :: Expr -> String
+showSC X       = "x"
+showSC (Num n) = show n
+showSC x       = "(" ++ showExpr x ++ ")"
 
 instance Show Expr where
   show = showExpr
@@ -75,11 +83,11 @@ factor ('(':s) =
    case expr s of
       Just (a, ')':s1) -> Just (a, s1)
       _                -> Nothing
-factor ('S':'i':'n':s) =
+factor ('s':'i':'n':s) =
    case factor s of
       Just (a, s1) -> Just (Sin a, s1)
       _            -> Nothing
-factor ('C':'o':'s':s) =
+factor ('c':'o':'s':s) =
    case factor s of
       Just (a, s1) -> Just (Cos a, s1)
       _            -> Nothing
