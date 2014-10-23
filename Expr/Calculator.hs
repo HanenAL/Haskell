@@ -5,14 +5,18 @@ import Haste.Graphics.Canvas
 
 import Expr
 import Pages
-
-
+import Data.Maybe
 
 canWidth  = 300
 canHeight = 300
 
 readAndDraw :: Elem -> Canvas -> IO ()
-readAndDraw = undefined
+readAndDraw input can = do
+                         s <- getProp input "value"
+                         case readExpr s of
+                            Just a  -> render can $ stroke $ path $ points a 0.04 (canWidth, canHeight)
+                            Nothing -> alert "Error"
+                         
 
 main = do
     -- Elements
@@ -44,4 +48,10 @@ main = do
 -----------------------------------------------------------------------------
 
 points :: Expr -> Double -> (Int,Int) -> [Point]
-points expr scale (width, height) = undefined
+points expr scale (width, height) = [ (a, realToPix (eval expr (pixToReal a))) | a <- [0..(fromIntegral width)] ]
+   where
+    pixToReal :: Double -> Double
+    pixToReal x = (x - (fromIntegral width) / 2) * scale
+
+    realToPix :: Double -> Double
+    realToPix y = (-y / scale) + (fromIntegral height) / 2       
