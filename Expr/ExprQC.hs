@@ -9,7 +9,8 @@ import Expr
 -----------------------------------------------------------------------------
 
 prop_ShowReadExpr :: Expr -> Bool
-prop_ShowReadExpr expr = (eval (fromJust (readExpr $ showExpr expr)) 0) `almostEqual` (eval expr  0)
+prop_ShowReadExpr expr = (eval e1 0) `almostEqual` (eval expr  0)
+   where (Just e1) = (readExpr $ showExpr expr)
 
 almostEqual :: Double -> Double -> Bool
 almostEqual x y = (x - y) <= 0.001

@@ -31,9 +31,11 @@ showFactor (Add a b) = "(" ++ showExpr (Add a b) ++")"
 showFactor e         = showExpr e
 
 showSC :: Expr -> String
-showSC X       = "x"
-showSC (Num n) = show n
-showSC x       = "(" ++ showExpr x ++ ")"
+showSC X           = "x"
+showSC (Num n)     = show n
+showSC x@(Add a b) = "(" ++ showExpr x ++ ")"
+showSC x@(Mul a b) = "(" ++ showFactor x ++ ")"
+showSC x           = showExpr x
 
 instance Show Expr where
   show = showExpr
@@ -53,11 +55,7 @@ eval (Cos n) x   = cos (eval n x)
 type Parser a = String -> Maybe (a,String)
 
 number :: Parser Double
-number ('-':s) = fmap negate' (number s)
 number s = listToMaybe(reads s)
-
-negate' :: (Double,String) -> (Double,String)
-negate' (n,s) = (-n,s)
 
 num :: Parser Expr
 num s = case number s of

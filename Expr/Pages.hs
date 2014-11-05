@@ -73,4 +73,3 @@ mkCanvas width height = do
     setProp canvas "width" (show width)
     setProp canvas "height" (show height)
     return canvas
-
